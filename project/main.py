@@ -1,4 +1,10 @@
-from data_processing import explore_data, filtering_data, create_gdf, create_geometries
+from data_processing import (
+    explore_data,
+    filtering_data,
+    create_gdf,
+    create_geometries,
+    reproject_data,
+)
 from map_generator import generate_map_with_buffer, add_closest_building_to_map
 from shapely.geometry import Point, Polygon
 import geopandas as gpd
@@ -31,20 +37,22 @@ def main():
     filtered_df = filtering_data(building_data_complete)
     filtered_df = create_geometries(filtered_df)
 
+    # Create gdf
     target_point = Point(CRISTO_RENDOTOR_TARGET[0], CRISTO_RENDOTOR_TARGET[1])
     target_gdf = create_gdf(target_point)
 
-    filtered_gdf = (
-        gpd.GeoDataFrame(filtered_df, geometry="geometry")
-        .set_crs("EPSG:4326")
-        .to_crs(epsg=31983)
+    # Create gdf and reproject data
+    filtered_gdf = gpd.GeoDataFrame(filtered_df, geometry="geometry").set_crs(
+        "EPSG:4326"
     )
-    target_gdf = target_gdf.to_crs(epsg=31983)
+    filtered_gdf = reproject_data(filtered_gdf, 31983)
+    target_gdf = reproject_data(target_gdf, 31983)
 
     filtered_gdf["distance_to_target_meters"] = filtered_gdf.geometry.distance(
         target_gdf.geometry[0]
     )
 
+    # Find closest building
     closest_id = filtered_gdf["distance_to_target_meters"].idxmin()
     closest_building_metres = filtered_gdf.loc[closest_id]
 

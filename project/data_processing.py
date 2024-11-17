@@ -71,3 +71,17 @@ def create_geometries(filtered_df):
     """
     filtered_df["geometry"] = filtered_df["geometry"].apply(wkt.loads)
     return filtered_df
+
+
+def reproject_data(data_gdf, target_crs):
+    """
+    Reprojects a GeoDataFrame to the specified CRS.
+
+    Parameters:
+    data_gdf (gpd.GeoDataFrame): The GeoDataFrame to reproject.
+    target_crs (int or str): The target coordinate reference system (e.g., "EPSG:31983").
+
+    Returns:
+    gpd.GeoDataFrame: The reprojected GeoDataFrame.
+    """
+    return data_gdf.to_crs(epsg=target_crs)
