@@ -3,14 +3,6 @@ import geopandas as gpd
 from shapely.geometry import Point, Polygon
 from shapely import wkt
 
-# CONSTANTS
-CRISTO_RENDOTOR_TARGET = (-43.21052677661779, -22.95183796600185)
-BUFFER_CLIP = 0.01  # Buffer zone in degrees
-MIN_LONG = CRISTO_RENDOTOR_TARGET[0] - BUFFER_CLIP
-MAX_LONG = CRISTO_RENDOTOR_TARGET[0] + BUFFER_CLIP
-MIN_LAT = CRISTO_RENDOTOR_TARGET[1] - BUFFER_CLIP
-MAX_LAT = CRISTO_RENDOTOR_TARGET[1] + BUFFER_CLIP
-
 
 def explore_data(file_path):
     """
@@ -28,7 +20,31 @@ def explore_data(file_path):
     return data
 
 
-def filtering_data(data):
+def create_buffer_clip(min_long, max_long, min_lat, max_lat):
+    """
+    Creates a rectangular buffer as a Polygon.
+
+    Parameters:
+    min_long (float): Minimum longitude.
+    max_long (float): Maximum longitude.
+    min_lat (float): Minimum latitude.
+    max_lat (float): Maximum latitude.
+
+    Returns:
+    shapely.geometry.Polygon: A polygon representing the rectangular buffer zone.
+    """
+    buffer_rect = Polygon(
+        [
+            (min_long, min_lat),
+            (min_long, max_lat),
+            (max_long, max_lat),
+            (max_long, min_lat),
+        ]
+    )
+    return buffer_rect
+
+
+def filtering_data(data, min_long, max_long, min_lat, max_lat):
     """
     Filters data to keep only records within the buffer zone.
 
@@ -38,11 +54,13 @@ def filtering_data(data):
     Returns:
     pd.DataFrame: Filtered dataframe.
     """
+
+    print("dans data filter ", min_long, max_long, min_lat, max_lat)
     return data[
-        (data["latitude"] >= MIN_LAT)
-        & (data["latitude"] <= MAX_LAT)
-        & (data["longitude"] >= MIN_LONG)
-        & (data["longitude"] <= MAX_LONG)
+        (data["latitude"] > min_lat)
+        & (data["latitude"] < max_lat)
+        & (data["longitude"] > min_long)
+        & (data["longitude"] < max_long)
     ]
 
 

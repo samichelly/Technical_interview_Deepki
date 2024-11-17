@@ -1,8 +1,8 @@
 import folium
-from shapely.geometry import LineString
+from shapely.geometry import Polygon, LineString
 
 
-def generate_map_with_buffer(filtered_df, target_point, buffer_rect):
+def generate_map_with_filtered_data(filtered_df, target_point, buffer_rect):
     """
     Generates a Folium map with the filtered buildings and the buffer zone.
 
@@ -24,6 +24,8 @@ def generate_map_with_buffer(filtered_df, target_point, buffer_rect):
         icon=folium.Icon(color="red", icon="star"),
     ).add_to(m)
 
+    print("buffer_rect ", buffer_rect)
+
     # Add the buffer zone (rectangle) to the map
     folium.Polygon(
         locations=[(point[1], point[0]) for point in buffer_rect.exterior.coords],
@@ -36,7 +38,9 @@ def generate_map_with_buffer(filtered_df, target_point, buffer_rect):
 
     # Add the filtered buildings to the map
     for idx, row in filtered_df.iterrows():
+        # print(row)
         if isinstance(row["geometry"], Polygon):
+            print("Polygoooooooooo : ", row["geometry"])
             polygon_coords = [
                 (point[1], point[0]) for point in row["geometry"].exterior.coords
             ]
@@ -46,7 +50,6 @@ def generate_map_with_buffer(filtered_df, target_point, buffer_rect):
                 fill=True,
                 fill_color="black",
                 fill_opacity=0.3,
-                popup=f"Building ID: {row.name}",  # Use index as the building ID
             ).add_to(m)
 
     return m
