@@ -1,7 +1,6 @@
 import pandas as pd
 import geopandas as gpd
-from shapely.geometry import Point, Polygon
-from shapely import wkt
+from shapely.geometry import Polygon
 
 
 def explore_data(file_path):
@@ -55,40 +54,12 @@ def filtering_data(data, min_long, max_long, min_lat, max_lat):
     pd.DataFrame: Filtered dataframe.
     """
 
-    print("dans data filter ", min_long, max_long, min_lat, max_lat)
     return data[
         (data["latitude"] > min_lat)
         & (data["latitude"] < max_lat)
         & (data["longitude"] > min_long)
         & (data["longitude"] < max_long)
     ]
-
-
-def create_gdf(input_layer):
-    """
-    Creates a GeoDataFrame from a geometry object.
-
-    Parameters:
-    input_layer (shapely.geometry): Geometry object.
-
-    Returns:
-    gpd.GeoDataFrame: GeoDataFrame.
-    """
-    return gpd.GeoDataFrame({"geometry": [input_layer]}, crs="EPSG:4326")
-
-
-def create_geometries(filtered_df):
-    """
-    Converts WKT geometries to Shapely objects.
-
-    Parameters:
-    filtered_df (pd.DataFrame): Dataframe with WKT geometries.
-
-    Returns:
-    pd.DataFrame: Dataframe with converted geometries.
-    """
-    filtered_df["geometry"] = filtered_df["geometry"].apply(wkt.loads)
-    return filtered_df
 
 
 def reproject_data(data_gdf, target_crs):

@@ -1,19 +1,18 @@
 from data_processing import (
     explore_data,
     filtering_data,
-    create_gdf,
-    create_geometries,
     reproject_data,
     create_buffer_clip,
 )
 from map_generator import generate_map_with_filtered_data, add_closest_building_to_map
-from shapely.geometry import Point, Polygon
+from shapely import wkt
+from shapely.geometry import Point
 import geopandas as gpd
 
 
 # CONSTANTS
 CRISTO_RENDOTOR_TARGET = (-43.21052677661779, -22.95183796600185)  # Longitude, Latitude
-OFFSET_CLIP = 0.01 # approximately +/- 1km
+OFFSET_CLIP = 0.01  # approximately +/- 1km
 
 # Calculate the limits of the buffer zone
 MIN_LONG = CRISTO_RENDOTOR_TARGET[0] - OFFSET_CLIP
@@ -25,59 +24,57 @@ FILE = "009_buildings.csv"
 
 
 def main():
-    building_data_complete = explore_data(FILE)
+    # Try to load the building data from the specified CSV file
+    try:
+        building_data_complete = explore_data(FILE)
+    except FileNotFoundError:
+        # Handle case if the file is not found
+        print(f"Error: {FILE} not found.")
+        return
 
-    # buffer_rect = Polygon(
-    #     [
-    #         (MIN_LONG, MIN_LAT),
-    #         (MIN_LONG, MAX_LAT),
-    #         (MAX_LONG, MAX_LAT),
-    #         (MAX_LONG, MIN_LAT),
-    #     ]
-    # )
-
-    # Create clip around target
+    # Create a rectangular buffer around the target point (Cristo Redentor)
     buffer_rect = create_buffer_clip(MIN_LONG, MAX_LONG, MIN_LAT, MAX_LAT)
-    print("Buffer rectangle created:", buffer_rect)
 
+    # Filter the building data to keep only the buildings within the buffer zone
     filtered_df = filtering_data(
         building_data_complete, MIN_LONG, MAX_LONG, MIN_LAT, MAX_LAT
     )
 
-    print('printing 1: \n',  filtered_df)
-    filtered_df = create_geometries(filtered_df)
-
-    # Create gdf
-    target_point = Point(CRISTO_RENDOTOR_TARGET[0], CRISTO_RENDOTOR_TARGET[1])
-    target_gdf = create_gdf(target_point)
-
-    # Create gdf and reproject data
-    filtered_gdf = gpd.GeoDataFrame(filtered_df, geometry="geometry").set_crs(
-        "EPSG:4326"
+    # Convert WKT geometries to Shapely geometries to GeoDataFrame with the specified CRS
+    filtered_gdf = gpd.GeoDataFrame(
+        filtered_df,
+        geometry=filtered_df["geometry"].apply(
+            wkt.loads
+        ),  # Convert WKT to Shapely geometries
+        crs="EPSG:4326",  # Directement définir le CRS
     )
 
-    m = generate_map_with_filtered_data(filtered_gdf, target_point, buffer_rect)
-    m.save("first_map.html")
+    # Create a GeoDataFrame for the target point (Cristo Redentor)
+    target_point = Point(CRISTO_RENDOTOR_TARGET[0], CRISTO_RENDOTOR_TARGET[1])
+    target_gdf = gpd.GeoDataFrame({"geometry": [target_point]}, crs="EPSG:4326")
 
+    # Generate a map with the filtered buildings and the buffer zone, centered around the target point
+    m = generate_map_with_filtered_data(filtered_gdf, target_point, buffer_rect)
+    m.save("data_filtered_map.html")
+
+    # Reproject both the filtered buildings and the target to use meters unit
     filtered_gdf = reproject_data(filtered_gdf, 31983)
     target_gdf = reproject_data(target_gdf, 31983)
 
+    # Calculate the distance of each building to the target point
     filtered_gdf["distance_to_target_meters"] = filtered_gdf.geometry.distance(
         target_gdf.geometry[0]
     )
 
-    print("filtered_gdf :", filtered_gdf)
-    # Find closest building
+    # Find the ID of the closest building by selecting the minimum distance to the target
     closest_id = filtered_gdf["distance_to_target_meters"].idxmin()
     closest_building_metres = filtered_gdf.loc[closest_id]
+    print(closest_building_metres)
 
-
-    # m2 = add_closest_building_to_map(
-    #     m, closest_building_metres, target_point, CRISTO_RENDOTOR_TARGET
-    # )
-
-    # m2.save("final_map.html")
-    print("Map saved as 'final_map.html'")
+    # Generate a new map with the closest building added to the map and a line showing the distance to the target
+    m2 = add_closest_building_to_map(m, closest_building_metres, CRISTO_RENDOTOR_TARGET)
+    m2.save("closest_building_map.html")
+    print("Map saved as 'closest_building_map.html'\nYou need to zoom in")
 
 
 if __name__ == "__main__":

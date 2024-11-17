@@ -24,8 +24,6 @@ def generate_map_with_filtered_data(filtered_df, target_point, buffer_rect):
         icon=folium.Icon(color="red", icon="star"),
     ).add_to(m)
 
-    print("buffer_rect ", buffer_rect)
-
     # Add the buffer zone (rectangle) to the map
     folium.Polygon(
         locations=[(point[1], point[0]) for point in buffer_rect.exterior.coords],
@@ -38,9 +36,7 @@ def generate_map_with_filtered_data(filtered_df, target_point, buffer_rect):
 
     # Add the filtered buildings to the map
     for idx, row in filtered_df.iterrows():
-        # print(row)
         if isinstance(row["geometry"], Polygon):
-            print("Polygoooooooooo : ", row["geometry"])
             polygon_coords = [
                 (point[1], point[0]) for point in row["geometry"].exterior.coords
             ]
@@ -55,7 +51,7 @@ def generate_map_with_filtered_data(filtered_df, target_point, buffer_rect):
     return m
 
 
-def add_closest_building_to_map(m, closest_building, target_point, target_coords):
+def add_closest_building_to_map(m, closest_building, target_coords):
     """
     Adds the closest building to the map, including a marker, polygon, and a line to the target.
 
