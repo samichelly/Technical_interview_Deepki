@@ -1,7 +1,7 @@
 # Technical Interview Deepki
 
 ## **Objective**  
-The goal of this project is to download, process, and analyze building footprint data from a public dataset. The output includes processed data visualizations saved as HTML files, which can be viewed in a browser. This repository provides two methods for running the workflow: using Google Colab or Docker.
+The goal of this project is to download, process, analyze building footprint data from a public dataset and to determine which building is the closest to Cristo Redentor. This repository provides two methods for running the workflow: using Google Colab or Docker.
 
 ---
 
