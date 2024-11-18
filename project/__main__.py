@@ -1,3 +1,4 @@
+from download_and_extract import download_and_extract
 from data_processing import (
     explore_data,
     filtering_data,
@@ -22,6 +23,9 @@ MAX_LONG = CRISTO_RENDOTOR_TARGET[0] + OFFSET_CLIP
 MIN_LAT = CRISTO_RENDOTOR_TARGET[1] - OFFSET_CLIP
 MAX_LAT = CRISTO_RENDOTOR_TARGET[1] + OFFSET_CLIP
 
+URL = "https://storage.googleapis.com/open-buildings-data/v3/polygons_s2_level_4_gzip/009_buildings.csv.gz"
+
+GZIPPED_FILE_NAME = "009_buildings.csv.gz"
 FILE = "009_buildings.csv"
 
 
@@ -30,6 +34,14 @@ file_path = parent_directory / "009_buildings.csv"
 
 
 def main():
+    # Download and extract the file
+    download_and_extract(URL, GZIPPED_FILE_NAME)
+
+    # Check if the file was successfully downloaded and extracted
+    if os.path.exists(FILE):
+        print(f"File successfully downloaded and extracted to {FILE}")
+    else:
+        print(f"Error: {FILE} not found.")
     # Try to load the building data from the specified CSV file
     try:
         building_data_complete = explore_data(file_path)
@@ -62,7 +74,7 @@ def main():
     # Generate a map with the filtered buildings and the buffer zone, centered around the target point
     m = generate_map_with_filtered_data(filtered_gdf, target_point, buffer_rect)
     m.save("data_filtered_map.html")
-    
+
     # Reproject both the filtered buildings and the target to use meters unit
     filtered_gdf = reproject_data(filtered_gdf, 31983)
     target_gdf = reproject_data(target_gdf, 31983)
