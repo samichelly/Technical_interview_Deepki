@@ -20,7 +20,7 @@ The goal of this project is to download, process, analyze building footprint dat
 ### **Method 2: Using Docker**  
 1. Clone this repository:  
     ```bash
-    https://github.com/samichelly/Technical_interview_Deepki.git
+    git clone https://github.com/samichelly/Technical_interview_Deepki.git
     cd Technical_interview_Deepki
     ```  
 
