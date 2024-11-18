@@ -8,6 +8,8 @@ from map_generator import generate_map_with_filtered_data, add_closest_building_
 from shapely import wkt
 from shapely.geometry import Point
 import geopandas as gpd
+import os
+from pathlib import Path
 
 
 # CONSTANTS
@@ -23,10 +25,14 @@ MAX_LAT = CRISTO_RENDOTOR_TARGET[1] + OFFSET_CLIP
 FILE = "009_buildings.csv"
 
 
+parent_directory = Path(__file__).resolve().parent.parent
+file_path = parent_directory / "009_buildings.csv"
+
+
 def main():
     # Try to load the building data from the specified CSV file
     try:
-        building_data_complete = explore_data(FILE)
+        building_data_complete = explore_data(file_path)
     except FileNotFoundError:
         # Handle case if the file is not found
         print(f"Error: {FILE} not found.")
@@ -56,7 +62,7 @@ def main():
     # Generate a map with the filtered buildings and the buffer zone, centered around the target point
     m = generate_map_with_filtered_data(filtered_gdf, target_point, buffer_rect)
     m.save("data_filtered_map.html")
-
+    
     # Reproject both the filtered buildings and the target to use meters unit
     filtered_gdf = reproject_data(filtered_gdf, 31983)
     target_gdf = reproject_data(target_gdf, 31983)
@@ -74,7 +80,6 @@ def main():
     # Generate a new map with the closest building added to the map and a line showing the distance to the target
     m2 = add_closest_building_to_map(m, closest_building_metres, CRISTO_RENDOTOR_TARGET)
     m2.save("closest_building_map.html")
-    print("Map saved as 'closest_building_map.html'\nYou need to zoom in")
 
 
 if __name__ == "__main__":
