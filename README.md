@@ -26,12 +26,12 @@ The goal of this project is to download, process, analyze building footprint dat
 
 2. Build the Docker image:  
     ```bash
-    docker build -t Technical_interview_Deepki .
+    docker build -t technical_interview_deepki .
     ```  
 
 3. Run the container:  
     ```bash
-    docker run -it Technical_interview_Deepki
+    docker run -it technical_interview_deepki
     ```  
 
 4. Once the processing is complete, the closest building will be display in the terminal  
