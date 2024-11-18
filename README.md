@@ -14,7 +14,7 @@ The goal of this project is to download, process, and analyze building footprint
 ## **Usage Instructions**  
 
 ### **Method 1: Using Google Colab**  
-1. Open the provided [Google Colab Notebook](#) [here](https://colab.research.google.com/drive/1zE1BYE-AlZaNv8d2qcP4M32_DJU52w2H?usp=sharing).
+1. Open the provided [Google Colab Notebook] [here](https://colab.research.google.com/drive/1zE1BYE-AlZaNv8d2qcP4M32_DJU52w2H?usp=sharing).
 2. Run the notebook
 
 ### **Method 2: Using Docker**  
