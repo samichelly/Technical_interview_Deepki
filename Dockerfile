@@ -1,27 +1,27 @@
 # syntax=docker/dockerfile:1
 
-# Utiliser une image Python minimale
+# Use a minimal Python image
 FROM python:3.11.5-slim
 
-# Désactiver les fichiers pyc et activer l'affichage immédiat des logs
+# Disable pyc files and enable immediate logging output
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1
 
-# Définir le répertoire de travail
+# Set the working directory
 WORKDIR /app
 
-# Installer wget et autres dépendances système si nécessaire
+# Install wget and other system dependencies if necessary
 RUN apt-get update && apt-get install -y wget ca-certificates && rm -rf /var/lib/apt/lists/*
 
-# Copier les dépendances et les installer
+# Copy the dependencies and install them
 COPY requirements.txt .
 RUN python -m pip install --no-cache-dir -r requirements.txt
 
-# Copier le script et le code
+# Copy the script and the application code
 COPY . .
 
-# Rendre le script Bash exécutable
+# Make the bash script executable
 RUN chmod +x download_and_extract_and_run.sh
 
-# Commande par défaut pour exécuter le script
+# Default command to run the script
 CMD ["./download_and_extract_and_run.sh"]
